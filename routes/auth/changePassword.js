@@ -1,15 +1,16 @@
-const { validateChangePassword } = require('../../validations/auth/validateAuth');
-const { PrismaClient } = require('@prisma/client');
+const { validateChangePassword } = require('../../helpers/validations/auth/validateAuth');
+const prisma = require('../../middlewares/prisma');
 const bcrypt = require('bcrypt');
 const router = require('express').Router();
+const isAuthenticated = require('../../middlewares/auth');
 
-const prisma = new PrismaClient();
+/* eslint-disable no-undef */
+const saltRounds = parseInt(process.env.SALT_ROUNDS);
+/* eslint-enable no-undef */
 
-const saltRounds = 10;
-
-router.patch('/:id', async(req, res) => {
+router.patch('/:id', isAuthenticated, async(req, res) => {
     try {
-        await validateChangePassword(req.body);
+        await validateChangePassword(req.body); 
     }
     catch (error) {
         return res.status(400).json({

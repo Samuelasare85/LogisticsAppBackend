@@ -54,7 +54,7 @@ async function validateSignUp(user) {
       .trim(),
       phone_number: string()
       .min(10)
-      .max(15) ,
+      .max(15),
       email_address: string()
         .min(5)
         .max(255)

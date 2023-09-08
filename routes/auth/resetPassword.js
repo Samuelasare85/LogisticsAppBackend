@@ -1,19 +1,17 @@
 const router = require('express').Router();
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../../middlewares/prisma');
 const moment = require('moment');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
-const isAuthenticated = require('../../middlewares/auth');
-const { validatePassword } = require('../../validations/auth/validateAuth');
+const { validatePassword } = require('../../helpers/validations/auth/validateAuth');
 
-const prisma = new PrismaClient();
 
 /* eslint-disable no-undef */
 const saltRounds = parseInt(process.env.SALT_ROUNDS);
 /* eslint-enable no-undef */
 
-router.patch('/:token', isAuthenticated, async (req, res) => {
+router.patch('/:token', async (req, res) => {
     const token = req.params.token;
   if (!token) return res.status(400).json({
     'status': 'error',
@@ -33,7 +31,7 @@ router.patch('/:token', isAuthenticated, async (req, res) => {
   if (!user) return res.status(404).json({
     'status': 'error',
     'error': 'User does not exist'
-  })
+  });
 
   try {
     await validatePassword(req.body);

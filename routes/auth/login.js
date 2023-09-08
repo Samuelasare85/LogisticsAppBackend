@@ -1,11 +1,10 @@
-const { validateLogin } = require('../../validations/auth/validateAuth');
-const { PrismaClient } = require('@prisma/client');
+const { validateLogin } = require('../../helpers/validations/auth/validateAuth');
+const prisma = require('../../middlewares/prisma');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 
-const prisma = new PrismaClient();
 
 router.post('', async (req, res) => {
     try{
@@ -45,7 +44,7 @@ router.post('', async (req, res) => {
 
     res.cookie('jwt', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production' ? true : false,
+        secure: process.env.NODE_ENV === 'production',
         maxAge: process.env.JWT_EXPIRATION * 60* 1000
       });
      /* eslint-enable no-undef */

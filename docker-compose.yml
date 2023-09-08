@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: logistics-app-backend
+    ports: 
+      - "3000:3000"
+    environment:
+      - REDIS_URL=127.0.0.1:6379
+
+  # redis_server:
+  #   image: redis/redis-stack-server:latest
+  #   ports:
+  #     - "6379:6379"

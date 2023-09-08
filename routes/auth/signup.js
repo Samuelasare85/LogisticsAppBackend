@@ -1,12 +1,12 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../../middlewares/prisma');
 const _ = require('lodash');
 const moment = require('moment');
-const { validateSignUp } = require('../../validations/auth/validateAuth');
+const { validateSignUp } = require('../../helpers/validations/auth/validateAuth');
+const { setRedisData, deleteRedisData } = require('../../redis/index');
 require('dotenv').config();
 
-const prisma = new PrismaClient();
 
 /* eslint-disable no-undef */
 const saltRounds = parseInt(process.env.SALT_ROUNDS);
@@ -46,10 +46,18 @@ router.post('', async (req, res) => {
             password: password,
             created_at: moment.utc(moment()).toISOString(),
         }})
-        .then((user) => res.json({
+        .then(async(user) => {
+
+        await setRedisData('user/' + user.id, _.pick(user, ['id', 'full_name', 'phone_number', 
+        'created_at', 'is_active', 'role']));
+
+        await deleteRedisData('all-users');
+        
+        return res.json({
             status: 'success', 
             user: _.pick(user, ['id', 'full_name', 'phone_number', 
-        'created_at', 'is_active', 'role'])}))
+        'created_at', 'is_active', 'role'])});
+    })
         .catch((error) => res.status(400).json(
             {
                 status: 'error',

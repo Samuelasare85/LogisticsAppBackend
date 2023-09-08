@@ -1,12 +1,10 @@
 const router = require('express').Router();
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../../middlewares/prisma');
 const crypto = require('crypto');
 const moment = require('moment');
-const isAuthenticated = require('../../middlewares/auth');
 
-const prisma = new PrismaClient();
 
-router.patch('/:id', isAuthenticated, async(req, res) => {
+router.patch('/:id', async(req, res) => {
     await prisma.user.findUnique({
         where: {
         id: req.params.id

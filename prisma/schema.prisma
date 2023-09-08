@@ -7,7 +7,8 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_URL")
+  url      =  env("DATABASE_URL")
+  // directUrl = env("DIRECT_DATABASE_URL")
 }
 
 model User {
@@ -23,4 +24,29 @@ model User {
   password_changed_at DateTime?
   password_reset_token String?
   password_reset_expires DateTime?
+  package Package[]
+}
+
+model Package {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  origin_address String 
+  origin_state String
+  origin_phone_number String 
+  origin_others String?
+  destination_address String
+  destination_state String
+  destination_phone_number String
+  destination_others String?
+  items String
+  items_weight Float
+  items_worth Float
+  delivery_type String
+  delivery_date DateTime?
+  items_charge Float
+  delivery_charges Float
+  tax_charges Float 
+  payment_made Boolean @default(false)
+  tracking_number String
+  user_id String @db.ObjectId
+  user User @relation(fields: [user_id], references: [id])
 }
