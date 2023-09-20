@@ -46,7 +46,20 @@ model Package {
   delivery_charges Float
   tax_charges Float 
   payment_made Boolean @default(false)
-  tracking_number String
+  tracking_number String @unique
   user_id String @db.ObjectId
   user User @relation(fields: [user_id], references: [id])
+}
+
+model AddressDetails {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  rawAddress String?
+  formattedAddress String?
+  longitude Float?
+  latitude Float?
+  streetNumber Int?
+  streetName String?
+  city String?
+  countryCode String?
+  zipcode String?
 }

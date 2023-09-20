@@ -15,4 +15,4 @@ RUN prisma generate
 
 EXPOSE 3000
 
-CMD ["DEBUG", "=", "*", "yarn", "run", "dev"]
+CMD ["yarn", "run", "dev"]

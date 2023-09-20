@@ -3,7 +3,6 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const fs = require('fs');
 const path = require('path');
-const debug = require('debug')('app:serverLog');
 const {auth, send_package} = require('./routes/combinedRoute');
 require('dotenv').config();
 const app = express();
@@ -27,5 +26,6 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('tiny'));
 }
 /* eslint-enable no-undef */
-
-app.listen(PORT, () => debug(`listening on port ${PORT}`));
+/* eslint-disable  no-console */
+app.listen(PORT, () => console.log(`Listening on port ${PORT} 🔥🔥`));
+/* eslint-enable  no-console */

@@ -7,7 +7,8 @@ const forgotPassword = require('./auth/forgotPassword');
 const resetPassword = require('./auth/resetPassword');
 const getaUser = require('./auth/getaUser');
 const getAllUsers = require('./auth/getAllUsers');
-const sendAPackage = require('./packages/send_a_package');
+const sendAPackage = require('./packages/sendAPackage');
+const updateAPackage = require('./packages/updateAPackage');
 
 const auth = express();
 const send_package = express();
@@ -22,6 +23,7 @@ auth.use('/get-a-user', getaUser);
 auth.use('/get-all-users', getAllUsers);
 
 send_package.use('/send-package', sendAPackage);
+send_package.use('/update-package', updateAPackage);
 
 module.exports = {
     auth, 
