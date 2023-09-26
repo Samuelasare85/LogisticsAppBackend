@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/Samuelasare85/LogisticsAppBackend.git",
-  "author": "SamuelAsare <samuel.asare@amalitech.com>",
+  "author": "Samuel Asare",
   "license": "MIT",
   "scripts": {
     "dev": "nodemon server.js"
+  },
+  "engines": {
+    "node": ">=15 <=17"
   },
   "dependencies": {
     "@prisma/client": "^5.1.1",
