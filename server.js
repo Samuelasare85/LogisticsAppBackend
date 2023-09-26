@@ -2,6 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const fs = require('fs');
+const cors = require('cors')
 const path = require('path');
 const {auth, send_package} = require('./routes/combinedRoute');
 require('dotenv').config();
@@ -16,6 +17,7 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
 morgan.token('type', function (req, res) { return req.headers['content-type'];});
 
 app.use(express.json());
+app.use(cors());
 app.use(helmet());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :date[web] :type', {stream: accessLogStream}));
 app.use('/auth', auth);
@@ -26,6 +28,7 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('tiny'));
 }
 /* eslint-enable no-undef */
+
 /* eslint-disable  no-console */
 app.listen(PORT, () => console.log(`Listening on port ${PORT} 🔥🔥`));
 /* eslint-enable  no-console */
