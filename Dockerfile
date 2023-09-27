@@ -9,6 +9,8 @@ RUN yarn install
 
 COPY . ./
 
+COPY ./prisma ./prisma
+
 RUN yarn global add nodemon
 RUN yarn global add prisma
 RUN prisma db push

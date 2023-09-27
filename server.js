@@ -2,7 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const fs = require('fs');
-const cors = require('cors')
+const cors = require('cors');
 const path = require('path');
 const {auth, send_package} = require('./routes/combinedRoute');
 require('dotenv').config();
