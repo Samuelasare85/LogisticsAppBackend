@@ -1,16 +1,16 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const prisma = require('../../middlewares/prisma');
+const sendMail = require('../../utils/sendMail');
 const _ = require('lodash');
 const moment = require('moment');
 const { validateSignUp } = require('../../helpers/validations/auth/validateAuth');
 const { setRedisData, deleteRedisData } = require('../../redis/index');
 require('dotenv').config();
 
-
 /* eslint-disable no-undef */
 const saltRounds = parseInt(process.env.SALT_ROUNDS);
-/* eslint-enable no-undef */
+
 
 router.post('', async (req, res) => {
     try {
@@ -48,14 +48,32 @@ router.post('', async (req, res) => {
         }})
         .then(async(user) => {
 
-        await setRedisData('user/' + user.id, _.pick(user, ['id', 'full_name', 'phone_number', 
+        await setRedisData('user/' + user.id, _.pick(user, ['id', 'email_address', 'full_name', 'phone_number', 
         'created_at', 'is_active', 'role']));
 
         await deleteRedisData('all-users');
+
+        try {
+            const details = {
+                from: process.env.SOURCE_EMAIL,
+                to: user.email_address,
+                subject : 'Welcome to Redi Express😉',
+                full_name: user.full_name,
+                instruction: 'We are excited to welcome you as a new user of our Logistics App. You have taken the first step towards streamlining your logistics management.',
+                emailFile: 'signUpTemplate.ejs'
+            };
+            sendMail(details);
+        } catch (error) {
+            return res.status(400).json(
+                {
+                    status: 'error',
+                    error : error
+                });
+        }
         
         return res.json({
             status: 'success', 
-            user: _.pick(user, ['id', 'full_name', 'phone_number', 
+            user: _.pick(user, ['id', 'full_name', 'email_address', 'phone_number', 
         'created_at', 'is_active', 'role'])});
     })
         .catch((error) => res.status(400).json(
@@ -65,5 +83,6 @@ router.post('', async (req, res) => {
             }
         ));
 });
+/* eslint-enable no-undef */
 
 module.exports = router;

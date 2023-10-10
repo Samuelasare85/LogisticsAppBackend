@@ -2,10 +2,13 @@ const router = require('express').Router();
 const isAuthenticated = require('../../middlewares/auth');
 const { validateUpdatePackage } = require('../../helpers/validations/package/validatePackage');
 const prisma = require('../../middlewares/prisma');
-const { setRedisData } = require('../../redis');
+const { setRedisData, deleteRedisData } = require('../../redis');
 const {calculateItemCharge, calculateTaxCharge, locationDecoder, calculateDistance, calculateDeliveryCharge} = require('../../helpers/itemCharges');
 const scheduleDelivery = require('../../helpers/deliveryCheck');
+const sendMail = require('../../utils/sendMail');
+const dateConverter = require('../../helpers/dateParser');
 
+/* eslint-disable no-undef */
 router.patch('/:id', isAuthenticated , async(req, res) => {
     try {
         await validateUpdatePackage(req.body); 
@@ -23,7 +26,7 @@ router.patch('/:id', isAuthenticated , async(req, res) => {
     });
     if (!trackExists) return res.status(400).json({
         status: 'error',
-        error: 'Tracking number does not exists, please try again'
+        error: 'Package does not exists, please try again'
     });
     
     const originAddress = await locationDecoder(req.body.origin_address ? req.body.origin_address : trackExists.origin_address, res);
@@ -56,10 +59,38 @@ router.patch('/:id', isAuthenticated , async(req, res) => {
         where :{
             tracking_number: req.params.id,
         },
-        data : req.body
+        data : req.body,
+        include : {
+            user : true
+        }
     })
     .then(async(package_created) => {
-        await setRedisData('package/' + package_created.id, package_created);
+        package_created.package_total = package_created.items_charge + package_created.tax_charges + package_created.delivery_charges;
+        await setRedisData('package/' + package_created.tracking_number, package_created);
+        await deleteRedisData('all-packages');
+
+        try {
+            const details = {
+                from: process.env.SOURCE_EMAIL,
+                to: package_created.user.email_address,
+                subject : 'Package update successful😉',
+                full_name: package_created.user.full_name,
+                instruction: 'Package updated successfully and your package details are below:',
+                delivery_date:  dateConverter(package_created.delivery_date),
+                items_charge: 'GH₵' + package_created.items_charge,
+                tax_charges : 'GH₵' + package_created.tax_charges,
+                delivery_charges: 'GH₵' + package_created.delivery_charges,
+                total_charges: 'GH₵' + package_created.package_total,
+                emailFile: 'packageTemplate.ejs'
+            };
+            sendMail(details);
+            delete package_created.user;
+        } catch (error) {
+            return res.status(400).json({
+                status: 'error',
+                error : error   
+            });
+        }
 
         return res.json({
         status: 'success',
@@ -71,5 +102,7 @@ router.patch('/:id', isAuthenticated , async(req, res) => {
         error : error
     }));
 });
+
+/* eslint-enable no-undef */
 
 module.exports = router; 

@@ -3,10 +3,11 @@ const prisma = require('../../middlewares/prisma');
 const bcrypt = require('bcrypt');
 const router = require('express').Router();
 const isAuthenticated = require('../../middlewares/auth');
+const sendMail = require('../../utils/sendMail');
 
 /* eslint-disable no-undef */
 const saltRounds = parseInt(process.env.SALT_ROUNDS);
-/* eslint-enable no-undef */
+
 
 router.patch('/:id', isAuthenticated, async(req, res) => {
     try {
@@ -55,10 +56,29 @@ router.patch('/:id', isAuthenticated, async(req, res) => {
             password: password
         }
     })
-    .then(() => res.json({
+    .then((user) => {
+    try {
+      const details = {
+          from: process.env.SOURCE_EMAIL,
+          to: user.email_address,
+          subject : 'Password Change Successful😉',
+          full_name: user.full_name,
+          instruction: 'Your password has been changed.',
+          emailFile: 'signUpTemplate.ejs'
+      };
+      sendMail(details);
+  } catch (error) {
+      return res.status(400).json(
+          {
+              status: 'error',
+              error : error
+          });
+  }
+    return res.json({
         status: 'success',
         message: 'Password updated successfully'
-    }))
+    });
+})
     .catch((error) => res.status(400).json(
         {
             status: 'error',
@@ -66,5 +86,6 @@ router.patch('/:id', isAuthenticated, async(req, res) => {
         }
     ));
 });
+/* eslint-enable no-undef */
 
 module.exports = router;

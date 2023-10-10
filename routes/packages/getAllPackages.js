@@ -1,36 +1,31 @@
 const router = require('express').Router();
 const prisma = require('../../middlewares/prisma');
-const _ = require('lodash');
 const { getRedisData, setRedisData } = require('../../redis/index');
 const isAuthenticated = require('../../middlewares/auth');
 
 
 router.get('', isAuthenticated,  async(req, res) => {
     if (req.user.role === 'Admin') {
-        let users = await getRedisData('all-users');
-        if (users) return res.json({
+        const packages = await getRedisData('all-packages');
+        if (packages) return res.json({
                 status: 'success', 
-                users: users
-            });
+                packages: packages});
 
-        await prisma.user.findMany()
-        .then(async(users) => {
-            await setRedisData('all-users', users.map(user => _.pick(user, ['id','email_address', 'full_name', 'phone_number', 
-        'created_at', 'is_active', 'role'])));
+        await prisma.package.findMany()
+        .then(async(packages) => {
+            await setRedisData('all-packages', packages);
         
         return res.json({
             status: 'success',  
-            users: users.map(user =>_.pick(user, ['id', 'email_address', 'full_name', 'phone_number', 
-        'created_at', 'is_active', 'role']))});
-
+            packages: packages});
         })
-        .catch(() => {
+        .catch((error) => {
             res.status(404).json({
                 status : 'error',
-                error : 'User does not exist'
-            });
+                error : error
+                });
         });
-    } else {
+    }else {
         return res.status(400).json({
             status: 'error',
             error: 'Not authorized'

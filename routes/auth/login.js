@@ -18,7 +18,8 @@ router.post('', async (req, res) => {
 
     let user = await prisma.user.findUnique({
         where : {
-            email_address : req.body.email_address
+            email_address : req.body.email_address,
+            is_active : true
         }
     });
 

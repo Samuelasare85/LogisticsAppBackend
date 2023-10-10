@@ -39,7 +39,7 @@ async function validatePackage(package_item) {
       tracking_number: string()
       .trim()
        .min(16)
-       .max(22)
+       .max(50)
       .required('Tracking number is required')
     });
     return await packageObject.validate(package_item);

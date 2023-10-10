@@ -23,6 +23,7 @@ model User {
   role String @default("User")
   password_changed_at DateTime?
   password_reset_token String?
+  profile_image String?
   password_reset_expires DateTime?
   package Package[]
 }

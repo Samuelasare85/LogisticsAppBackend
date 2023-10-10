@@ -9,7 +9,7 @@ router.get('/:id', isAuthenticated,  async(req, res) => {
     let user = await getRedisData('user/' + req.params.id);
     if (user) return res.json({
             status: 'success', 
-            user: _.pick(user, ['id', 'full_name', 'phone_number', 
+            user: _.pick(user, ['id', 'email_address', 'full_name', 'phone_number', 
         'created_at', 'is_active', 'role'])});
 
     await prisma.user.findUnique({
@@ -18,12 +18,12 @@ router.get('/:id', isAuthenticated,  async(req, res) => {
         },
     })
     .then(async(user) => {
-        await setRedisData('user/' + req.params.id, _.pick(user, ['id', 'full_name', 'phone_number', 
+        await setRedisData('user/' + req.params.id, _.pick(user, ['id','email_address', 'full_name', 'phone_number', 
     'created_at', 'is_active', 'role']));
     
     return res.json({
         status: 'success',  
-        user: _.pick(user, ['id', 'full_name', 'phone_number', 
+        user: _.pick(user, ['id','email_address', 'full_name', 'phone_number', 
     'created_at', 'is_active', 'role'])});
     })
     .catch(() => {

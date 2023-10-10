@@ -3,9 +3,12 @@ const isAuthenticated = require('../../middlewares/auth');
 const { validatePackage } = require('../../helpers/validations/package/validatePackage');
 const prisma = require('../../middlewares/prisma');
 const {calculateItemCharge, calculateTaxCharge, locationDecoder, calculateDistance, calculateDeliveryCharge} = require('../../helpers/itemCharges');
-const { setRedisData } = require('../../redis');
+const { setRedisData, deleteRedisData } = require('../../redis');
 const scheduleDelivery = require('../../helpers/deliveryCheck');
+const sendMail = require('../../utils/sendMail');
+const dateConverter = require('../../helpers/dateParser');
 
+/* eslint-disable no-undef */
 router.post('', isAuthenticated , async(req, res) => {
     try {
         await validatePackage(req.body); 
@@ -39,13 +42,40 @@ router.post('', isAuthenticated , async(req, res) => {
 
     await prisma.package.create({
         data : req.body,
+        include : {
+            user : true
+        }
     })
     .then(async(package_created) => {
         package_created.package_total = package_created.items_charge + package_created.tax_charges + package_created.delivery_charges;
-        await setRedisData('package/' + package_created.id, package_created);
+        await setRedisData('package/' + package_created.tracking_number, package_created);
+        await deleteRedisData('all-packages');
+
+        try {
+            const details = {
+                from: process.env.SOURCE_EMAIL,
+                to: package_created.user.email_address,
+                subject : 'Package creation successful😉',
+                full_name: package_created.user.full_name,
+                instruction: 'Package created successfully and your package details are below:',
+                delivery_date: dateConverter(package_created.delivery_date),
+                items_charge: 'GH₵' + package_created.items_charge,
+                tax_charges : 'GH₵' + package_created.tax_charges,
+                delivery_charges: 'GH₵' + package_created.delivery_charges,
+                total_charges: 'GH₵' + package_created.package_total,
+                emailFile: 'packageTemplate.ejs'
+            };
+            sendMail(details);
+            delete package_created.user;
+        } catch (error) {
+            return res.status(400).json({
+                status: 'error',
+                error : error   
+            });
+        }
         return res.json({
-        status: 'success',
-        package: package_created
+            status: 'success',
+            package: package_created
         });
     })
     .catch((error) => res.status(400).json({ 
@@ -53,5 +83,6 @@ router.post('', isAuthenticated , async(req, res) => {
         error : error
     }));
 });
+/* eslint-enable no-undef */
 
 module.exports = router; 
