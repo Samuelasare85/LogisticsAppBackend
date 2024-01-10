@@ -21,7 +21,7 @@ router.post('', async (req, res) => {
             error : error?.errors[0]
         });
     }
-
+    
     let user = await prisma.user.findUnique({
         where: {
             'email_address': req.body.email_address,
@@ -37,51 +37,44 @@ router.post('', async (req, res) => {
     await bcrypt
     .hash(req.body.password, saltRounds)
     .then((hash) => (password = hash));
-
-    await prisma.user.create({
-        data : {
-            full_name: req.body.full_name,
-            email_address: req.body.email_address,
-            phone_number: req.body.phone_number,
-            password: password,
-            created_at: moment.utc(moment()).toISOString(),
-        }})
-        .then(async(user) => {
-
-        await setRedisData('user/' + user.id, _.pick(user, ['id', 'email_address', 'full_name', 'phone_number', 
-        'created_at', 'is_active', 'role']));
-
+    
+    try {
+        const user = await prisma.user.create({
+            data: {
+                full_name: req.body.full_name,
+                email_address: req.body.email_address,
+                phone_number: req.body.phone_number,
+                password: password,
+                created_at: moment.utc(moment()).toISOString(),
+            },
+        });
+    
+        await setRedisData('user/' + user.id, _.pick(user, ['id', 'email_address', 'full_name', 'phone_number', 'created_at', 'is_active', 'role']));
         await deleteRedisData('all-users');
-
-        try {
-            const details = {
-                from: process.env.SOURCE_EMAIL,
-                to: user.email_address,
-                subject : 'Welcome to Redi Express😉',
-                full_name: user.full_name,
-                instruction: 'We are excited to welcome you as a new user of our Logistics App. You have taken the first step towards streamlining your logistics management.',
-                emailFile: 'signUpTemplate.ejs'
-            };
-            sendMail(details);
-        } catch (error) {
-            return res.status(400).json(
-                {
-                    status: 'error',
-                    error : error
-                });
-        }
+    
+        const details = {
+            from: process.env.SOURCE_EMAIL,
+            to: user.email_address,
+            subject: 'Welcome to Redi Express😉',
+            full_name: user.full_name,
+            instruction: 'We are excited to welcome you as a new user of our Logistics App. You have taken the first step towards streamlining your logistics management.',
+            emailFile: 'signUpTemplate.ejs',
+        };
         
+        await sendMail(details);
+    
         return res.json({
-            status: 'success', 
-            user: _.pick(user, ['id', 'full_name', 'email_address', 'phone_number', 
-        'created_at', 'is_active', 'role'])});
-    })
-        .catch((error) => res.status(400).json(
-            {
-                status: 'error',
-                error : error
-            }
-        ));
+            status: 'success',
+            user: _.pick(user, ['id', 'full_name', 'email_address', 'phone_number', 'created_at', 'is_active', 'role']),
+        });
+    } catch (error) {
+    
+        return res.status(400).json({
+            status: 'error',
+            error: error
+        });
+    }
+        
 });
 /* eslint-enable no-undef */
 
