@@ -20,7 +20,7 @@ function calculateDeliveryCharge(distance) {
     return parseFloat(charge.toFixed(1));
 }
 
-async function locationDecoder(address, res) {
+async function locationDecoder(address) {
     
     try {
         const foundAddress = await prisma.addressDetails.findFirst({
@@ -58,23 +58,13 @@ async function locationDecoder(address, res) {
                 zipcode: result[0]?.zipcode
             }
         })
-        .then((result) => {
-            return result;
-        })
-        .catch((error) => res.status(404).json({
-            status: 'error',
-            error: error 
-        }));
+        .then(result => result)
+        .catch(error => error);
     })
-    .catch(error => res.status(404).json({
-        status: 'error',
-        error: error
-    }))}
-    catch (error) {
-    res.status(404).json({
-        status: 'error',
-        error: error
-    });}
+    .catch(error => error);
+    } catch (error) {
+    return error;
+    }
 }
 
 function degreesToRadians(degrees) {

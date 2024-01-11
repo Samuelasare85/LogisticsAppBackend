@@ -29,16 +29,12 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
 /* eslint-enable no-undef */
 
 morgan.token('type', function (req, res) { return req.headers['content-type'];});
-// const corsOptions = {
-//   origin: 'http://localhost:3000',
-//   optionsSuccessStatus: 200 
-// };
 
 app.use(express.json());
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 app.use(Sentry.Handlers.errorHandler());
-app.use(cors());
+app.use(cors({'credentials': true}));
 app.use(helmet());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :date[web] :type', {stream: accessLogStream}));
 app.use('/auth', auth);

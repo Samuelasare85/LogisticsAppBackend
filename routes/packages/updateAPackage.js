@@ -29,7 +29,7 @@ router.patch('/:id', isAuthenticated , async(req, res) => {
         error: 'Package does not exists, please try again'
     });
     
-    const originAddress = await locationDecoder(req.body.origin_address ? req.body.origin_address : trackExists.origin_address, res);
+    const originAddress = await locationDecoder(req.body.origin_address ? req.body.origin_address : trackExists.origin_address);
     if(!originAddress.latitude && !originAddress.longitude) {
         return res.status(400).json({ 
             status: 'error',
@@ -37,7 +37,7 @@ router.patch('/:id', isAuthenticated , async(req, res) => {
         });
     }
 
-    const destinationAddress = await locationDecoder(req.body.destination_address ? req.body.destination_address : trackExists.destination_address, res);
+    const destinationAddress = await locationDecoder(req.body.destination_address ? req.body.destination_address : trackExists.destination_address);
     if(!destinationAddress.latitude && !destinationAddress.longitude) {
         return res.status(400).json({ 
             status: 'error',
