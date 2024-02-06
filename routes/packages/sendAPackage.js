@@ -22,6 +22,10 @@ router.post('', isAuthenticated , async(req, res) => {
     const trackExists = await prisma.package.findFirst({
         where : {
             tracking_number : req.body.tracking_number
+        },
+        cacheStrategy: {
+            ttl: 60,
+            swr: 10
         }
     });
     if (trackExists) return res.status(400).json({

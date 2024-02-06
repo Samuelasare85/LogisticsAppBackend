@@ -11,7 +11,12 @@ router.get('', isAuthenticated,  async(req, res) => {
                 status: 'success', 
                 packages: packages});
 
-        await prisma.package.findMany()
+        await prisma.package.findMany({
+            cacheStrategy: {
+                ttl: 60,
+                swr: 10
+            }
+        })
         .then(async(packages) => {
             await setRedisData('all-packages', packages);
         

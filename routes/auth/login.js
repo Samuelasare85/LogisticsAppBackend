@@ -20,6 +20,10 @@ router.post('', async (req, res) => {
         where : {
             email_address : req.body.email_address,
             is_active : true
+        },
+        cacheStrategy: {
+            ttl: 60,
+            swr: 10
         }
     });
 
@@ -31,7 +35,7 @@ router.post('', async (req, res) => {
     const match = await bcrypt.compare(req.body.password, user.password);
     if (!match) return res.status(400).json({
         status : 'error',
-        error : 'Invalid credentials'
+        error : 'Invalid credentials. Please try again.'
     });
 
     /* eslint-disable no-undef */

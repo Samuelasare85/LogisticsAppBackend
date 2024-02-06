@@ -13,6 +13,10 @@ router.get('/:id', isAuthenticated,  async(req, res) => {
     await prisma.package.findFirst({
         where : {
             tracking_number : req.params.id
+        },
+        cacheStrategy: {
+            ttl: 60,
+            swr: 10
         }
     })
     .then(async(package_exist) => {

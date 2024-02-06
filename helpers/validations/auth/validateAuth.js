@@ -4,7 +4,7 @@ const { object, string } = require('yup');
 async function validateSignUp(user) {
     let userObject = object({
       full_name: string()
-      .min(5)
+      .min(2)
       .max(75)
       .trim()
       .required('Full Name is required'),

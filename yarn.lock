@@ -101,7 +101,7 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@prisma/client@^5.1.1":
+"@prisma/client@5.8.0":
   version "5.8.0"
   resolved "https://registry.yarnpkg.com/@prisma/client/-/client-5.8.0.tgz#5f4c8c1c7cb60b1f4d39082bb214d048ffeb3730"
   integrity sha512-QxO6C4MaA/ysTIbC+EcAH1aX/YkpymhXtO6zPdk+FvA7+59tNibIYpd+7koPdViLg2iKES4ojsxWNUGNJaEcbA==
@@ -125,6 +125,11 @@
     "@prisma/engines-version" "5.8.0-37.0a83d8541752d7582de2ebc1ece46519ce72a848"
     "@prisma/fetch-engine" "5.8.0"
     "@prisma/get-platform" "5.8.0"
+
+"@prisma/extension-accelerate@^0.6.3":
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/@prisma/extension-accelerate/-/extension-accelerate-0.6.3.tgz#690f9d3a5d3be2d17591547929bc1d54fcc921a1"
+  integrity sha512-KnIfqbwCNMP3t1jgw76IVCE4HspRmWxagR0L4wJS+/74BgkRHrt/9ic8ONo7dir4AGGoHyg/Ej8yN+uGXNrXeg==
 
 "@prisma/fetch-engine@5.8.0":
   version "5.8.0"

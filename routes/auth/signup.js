@@ -26,10 +26,14 @@ router.post('', async (req, res) => {
         where: {
             'email_address': req.body.email_address,
         },
+        cacheStrategy: {
+            ttl: 60,
+            swr: 10
+        }
     });
     if (user) return res.status(409).json({
         status : 'error',
-        error : 'User already exists'
+        error : 'User already exists. Please try again.'
         });
 
     let password = '';

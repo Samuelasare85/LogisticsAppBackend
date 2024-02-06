@@ -16,6 +16,10 @@ router.get('/:id', isAuthenticated,  async(req, res) => {
         where: {
             'id': req.params.id
         },
+        cacheStrategy: {
+            ttl: 60,
+            swr: 10
+        }
     })
     .then(async(user) => {
         await setRedisData('user/' + req.params.id, _.pick(user, ['id','email_address', 'full_name', 'phone_number', 

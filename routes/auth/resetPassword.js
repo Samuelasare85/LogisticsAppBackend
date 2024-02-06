@@ -25,9 +25,13 @@ router.patch('/:token', async (req, res) => {
       password_reset_token: hashedToken,
       password_reset_expires : {
         gt: moment.utc(moment())
+      }
+      },
+      cacheStrategy: {
+        ttl: 60,
+        swr: 10
     }
-  }
-  });
+    });
   if (!user) return res.status(404).json({
     'status': 'error',
     'error': 'User does not exist'
