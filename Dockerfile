@@ -12,7 +12,7 @@ COPY . ./
 RUN yarn global add nodemon
 RUN yarn global add prisma
 RUN prisma db push
-RUN prisma generate
+RUN prisma generate --no-engine
 
 EXPOSE 3000
 

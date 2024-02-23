@@ -19,10 +19,6 @@ router.patch('/:id', async(req, res) => {
         const user_exists = await prisma.user.findUnique({
             where: {
                 id: req.params.id
-            },
-            cacheStrategy: {
-                ttl: 60,
-                swr: 10
             }
         });
 

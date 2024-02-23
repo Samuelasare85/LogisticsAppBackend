@@ -15,10 +15,6 @@ router.get('/:id', isAuthenticated,  async(req, res) => {
     await prisma.user.findUnique({
         where: {
             'id': req.params.id
-        },
-        cacheStrategy: {
-            ttl: 60,
-            swr: 10
         }
     })
     .then(async(user) => {

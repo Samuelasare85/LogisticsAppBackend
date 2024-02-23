@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 
 router.post('', async (req, res) => {
     try{
+
         await validateLogin(req.body);
     } catch(error) {
         return res.status(400).json({
@@ -20,10 +21,6 @@ router.post('', async (req, res) => {
         where : {
             email_address : req.body.email_address,
             is_active : true
-        },
-        cacheStrategy: {
-            ttl: 60,
-            swr: 10
         }
     });
 
@@ -58,7 +55,7 @@ router.post('', async (req, res) => {
         status: 'success',
         token: token,
         user: _.pick(user, ['id', 'full_name', 'phone_number', 
-        'created_at', 'is_active', 'role'])
+        'created_at', 'is_active', 'role', 'profile_image'])
     });
 });
 

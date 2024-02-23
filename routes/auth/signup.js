@@ -25,10 +25,6 @@ router.post('', async (req, res) => {
     let user = await prisma.user.findUnique({
         where: {
             'email_address': req.body.email_address,
-        },
-        cacheStrategy: {
-            ttl: 60,
-            swr: 10
         }
     });
     if (user) return res.status(409).json({
@@ -49,11 +45,12 @@ router.post('', async (req, res) => {
                 email_address: req.body.email_address,
                 phone_number: req.body.phone_number,
                 password: password,
+                profile_image: req.body.profile_image ?? null,
                 created_at: moment.utc(moment()).toISOString(),
             },
         });
     
-        await setRedisData('user/' + user.id, _.pick(user, ['id', 'email_address', 'full_name', 'phone_number', 'created_at', 'is_active', 'role']));
+        await setRedisData('user/' + user.id, _.pick(user, ['id', 'email_address', 'full_name', 'phone_number', 'profile_image', 'created_at', 'is_active', 'role']));
         await deleteRedisData('all-users');
     
         const details = {
@@ -69,7 +66,7 @@ router.post('', async (req, res) => {
     
         return res.json({
             status: 'success',
-            user: _.pick(user, ['id', 'full_name', 'email_address', 'phone_number', 'created_at', 'is_active', 'role']),
+            user: _.pick(user, ['id', 'full_name', 'email_address', 'profile_image', 'phone_number', 'created_at', 'is_active', 'role']),
         });
     } catch (error) {
     

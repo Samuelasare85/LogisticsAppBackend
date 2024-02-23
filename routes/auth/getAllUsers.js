@@ -13,12 +13,7 @@ router.get('', isAuthenticated,  async(req, res) => {
                 users: users
             });
 
-        await prisma.user.findMany({
-            cacheStrategy: {
-                ttl: 60,
-                swr: 10
-            }
-        })
+        await prisma.user.findMany()
         .then(async(users) => {
             await setRedisData('all-users', users.map(user => _.pick(user, ['id','email_address', 'full_name', 'phone_number', 
         'created_at', 'is_active', 'role'])));
